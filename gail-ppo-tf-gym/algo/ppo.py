@@ -76,6 +76,8 @@ class PPOTrain:
             tf.summary.scalar('total', loss)
 
         self.merged = tf.summary.merge_all()
+        #self.merged = [tf.summary.scalar('loss_clip', loss_clip), tf.summary.scalar('entropy', entropy),
+        #        tf.summary.scalar('value_difference', loss_vf), tf.summary.scalar('total', loss)]
         optimizer = tf.train.AdamOptimizer(learning_rate=1e-4, epsilon=1e-5)
         self.gradients = optimizer.compute_gradients(loss, var_list=pi_trainable)
         self.train_op = optimizer.minimize(loss, var_list=pi_trainable)
