@@ -13,11 +13,11 @@ exp_len=200
 
 def argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--savedir', help='name of directory to save model', default='trained_models/bc')
+    parser.add_argument('--savedir', help='name of directory to save model', default='trained_models/bc_reward')
     parser.add_argument('--max_to_keep', help='number of models to save', default=10, type=int)
-    parser.add_argument('--logdir', help='log directory', default='log/train/bc')
+    parser.add_argument('--logdir', help='log directory', default='log/train/bc_reward')
     parser.add_argument('--gamma', default=0.95, type=float)
-    parser.add_argument('--iteration', default=int(1e3), type=int)
+    parser.add_argument('--iteration', default=int(1e3), type=int)  # BC学习的此书
     parser.add_argument('--interval', help='save interval', default=int(1e2), type=int)
     parser.add_argument('--minibatch_size', default=128, type=int)
     parser.add_argument('--epoch_num', default=10, type=int)
@@ -31,23 +31,23 @@ def main(args):
     Policy = Policy_net('policy', env)
     Old_Policy = Policy_net('old_policy', env)
     PPO = PPOTrain(Policy, Old_Policy, gamma=args.gamma)
-    saver = tf.train.Saver(max_to_keep=args.max_to_keep)
+    saver = tf.train.Saver(max_to_keep=args.max_to_keep) #实例化一个Saver对象，在训练过程中，定期调用saver.save方法，像文件夹中写入包含当前模型中所有可训练变量的checkpoint文件 saver.save(sess,FLAGG.train_dir,global_step=step)
 
-    exp_obs = np.genfromtxt('trajectory/observations.csv')[0:exp_len]
+    exp_obs = np.genfromtxt('trajectory/observations.csv')[0:exp_len]   #exp_len=200
     exp_acts = np.genfromtxt('trajectory/actions.csv', dtype=np.int32)[0:exp_len]
 
     with tf.Session() as sess:
-        writer = tf.summary.FileWriter(args.logdir, sess.graph)
+        writer = tf.summary.FileWriter(args.logdir, sess.graph) #指定一个文件用来保存图。格式：tf.summary.FileWritter(path,sess.graph)，可以调用其add_summary（）方法将训练过程数据保存在filewriter指定的文件中
         sess.run(tf.global_variables_initializer())
 
-        inp = [exp_obs, exp_acts]
+        inp = [exp_obs, exp_acts]  #inp[0]就是observations， inp[1]就是actoins
         
         for iteration in range(args.iteration):  # episode
 
             # train
             for epoch in range(args.epoch_num):
                 # select sample indices in [low, high)
-                sample_indices = np.random.randint(low=0, high=exp_obs.shape[0], size=args.minibatch_size)
+                sample_indices = np.random.randint(low=0, high=exp_obs.shape[0], size=args.minibatch_size)   #函数的作用是，返回一个随机整型数，范围从低（包括）到高（不包括），即[low, high)
 
                 sampled_inp = [np.take(a=a, indices=sample_indices, axis=0) for a in inp]  # sample training data
                 BC.train(obs=sampled_inp[0], actions=sampled_inp[1])
