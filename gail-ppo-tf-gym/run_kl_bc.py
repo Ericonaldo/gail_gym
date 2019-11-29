@@ -58,6 +58,8 @@ def main(args):
                 saver.save(sess, args.savedir + '/model.ckpt', global_step=iteration+1)
 
             writer.add_summary(bc_summary, iteration)
+
+
         print("Done with BC. Start RL")
         # Start RL
         obs = env.reset()
