@@ -1,4 +1,25 @@
-# Generative Adversarial Imitation Learning for gym environments
+#  Energy-based Imitation Learning for gym environments
+
+## Get training data from trajectory data
+
+python Get_training_data.py
+
+## Energy network
+network_models/energy_net.py
+
+## Train Energy network
+
+python Train_energy.py
+
+## Restore trained energy models and use it to train our policy
+
+python Restore_energy_and_train_policy.py
+
+
+
+
+
+
 ## gail-ppo-tf-gym
 This repository provides a **TensorFlow** implementation of **Generatve Adversarial Imitation Learning (GAIL)** and **Behavioural Cloning (BC)** for classic **cartpole-v0** environment from OpenAI Gym. (based on <a href="https://arxiv.org/abs/1606.03476"><b>Generative Adversarial Imitation Learning,</b></a> Jonathan Ho & Stefano Ermon.)
 
