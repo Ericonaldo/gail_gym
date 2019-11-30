@@ -13,7 +13,7 @@ def argparser():
     parser.add_argument('--logdir', help='log directory', default='log/train/ppo')
     parser.add_argument('--savedir', help='save directory', default='trained_models/ppo')
     parser.add_argument('--gamma', default=0.95, type=float)
-    parser.add_argument('--iteration', default=int(e3), type=int)
+    parser.add_argument('--iteration', default=int(1e5), type=int)
     return parser.parse_args()
 
 
@@ -70,13 +70,17 @@ def main(args):
 
             if sum(rewards) >= 195:
                 success_num += 1
-                render = True
+                render = False
                 if success_num >= 100:
                     saver.save(sess, args.savedir+'/model.ckpt')
+                    print(iteration, "Needed for true reward for PPO")
                     print('Clear!! Model saved.')
                     break
             else:
                 success_num = 0
+
+            print("Trajectory", iteration,":")
+            print("rewards: ", sum(rewards))
 
             gaes = PPO.get_gaes(rewards=rewards, v_preds=v_preds, v_preds_next=v_preds_next)
 

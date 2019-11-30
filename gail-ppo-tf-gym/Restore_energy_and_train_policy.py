@@ -8,15 +8,16 @@ from network_models.energy_net import Energy_net
 from tools import kl_divergence
 import matplotlib
 import matplotlib.pyplot as plt
-
+render = True
 
 def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--modeldir', help='directory of model', default='trained_models')
     parser.add_argument('--alg', help='chose algorithm one of gail, ppo, bc, kl_bc, energy', default='energy')
-    parser.add_argument('--model', help='number of model to test. model.ckpt-number', default='5000')
+    parser.add_argument('--noise_type', help='chose noise type for energy model(new_noise or fixed_noise)', default='fixed_noise')
+    parser.add_argument('--model', help='number of model to test. model.ckpt-number', default='600')
     parser.add_argument('--logdir', help='log directory', default='log/test/energy_policy')
-    parser.add_argument('--iteration', default=int(1e5))
+    parser.add_argument('--iteration', default=int(1e7))
     parser.add_argument('--stochastic', action='store_false')
     parser.add_argument('--gamma', default=0.95, type=float)
     parser.add_argument('--max_to_keep', help='number of models to save', default=10, type=int)
@@ -35,11 +36,12 @@ def main(args):
         # writer = tf.summary.FileWriter(args.logdir+'/'+args.alg, sess.graph)
         sess.run(tf.global_variables_initializer())
         if args.model == '':
-            energy_saver.restore(sess, args.modeldir+'/'+args.alg+'/'+'model.ckpt')
+            energy_saver.restore(sess, args.modeldir+'/'+args.alg+'/'+args.noise_type+'/'+'model.ckpt')
         else:
-            energy_saver.restore(sess, args.modeldir+'/'+args.alg+'/'+'model.ckpt-'+args.model)
+            energy_saver.restore(sess, args.modeldir+'/'+args.alg+'/'+args.noise_type+'/'+'model.ckpt-'+args.model)
         print("As for model after ", args.model,"training iterations")
-        print("Energy looks like:",Energy.get_energy(sapairs))
+        print("Energy for expert sapairs looks like:",Energy.get_energy(sapairs))
+        print("Energy for noise sapairs looks like:", Energy.get_energy(noise_sapairs))
 
 
 
@@ -59,7 +61,7 @@ def main(args):
 
 
 
-        writer = tf.summary.FileWriter(args.logdir, sess.graph)
+        writer = tf.summary.FileWriter(args.logdir+'/'+args.noise_type, sess.graph)
         sess.run(tf.global_variables_initializer())
         obs = env.reset()
 
@@ -105,9 +107,9 @@ def main(args):
                 alter_reward = -energy
 
 
-                if render:
-                    # env.render()
-                    pass
+                #if render:
+                #env.render()
+                    # pass
                 if done:
                     v_preds_next = v_preds[1:] + [0]  # next state of terminate state has 0 state value
                     obs = env.reset()

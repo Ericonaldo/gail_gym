@@ -7,9 +7,13 @@ python Get_training_data.py
 ## Energy network
 network_models/energy_net.py
 
-## Train Energy network
+## Train Energy network with fixed gauss noise 
 
-python Train_energy.py
+python Train_energy_fixed_noise.py
+
+## Train Energy network with new gauss noise 
+
+python Train_energy_new_noise.py
 
 ## Restore trained energy models and use it to train our policy
 

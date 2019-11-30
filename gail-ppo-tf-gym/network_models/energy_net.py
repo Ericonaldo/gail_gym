@@ -40,11 +40,10 @@ class Energy_net:
 
             E_y_gradient = tf.gradients(self.energy, self.noise_sapairs)
             SigmaSquare_E_y_gradient = tf.multiply(self.sigma**2, E_y_gradient)
-            loss = tf.reduce_sum(tf.square(tf.norm(self.sapairs - self.noise_sapairs + SigmaSquare_E_y_gradient, ord='euclidean')))        #0.01为方差，也就是sigma平方
-            self.loss = tf.reduce_mean(loss)
+            self.loss = tf.reduce_mean(tf.square(self.sapairs - self.noise_sapairs + SigmaSquare_E_y_gradient))        #0.01为方差，也就是sigma平方
 
             optimizer = tf.train.AdamOptimizer()
-            self.train_op = optimizer.minimize(loss)
+            self.train_op = optimizer.minimize(self.loss)
 
 
 
